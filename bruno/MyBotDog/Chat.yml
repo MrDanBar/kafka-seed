@@ -1,0 +1,19 @@
+info:
+  name: Chat
+  type: http
+  seq: 1
+
+http:
+  method: GET
+  url: "{{url}}/{{user}}/assistant?question=tiene alguna perro en adopción, de mucho pelo?"
+  params:
+    - name: question
+      value: tiene alguna perro en adopción, de mucho pelo?
+      type: query
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
