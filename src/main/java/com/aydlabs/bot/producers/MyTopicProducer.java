@@ -32,8 +32,8 @@ public class MyTopicProducer {
         this.producer = producer;
     }
 
-    public void send(String key, String message) {
-        ProducerRecord<String, String> record = new ProducerRecord<>(TOPIC, key, message);
+    public void send(final String key, final String message) {
+        final ProducerRecord<String, String> record = new ProducerRecord<>(TOPIC, key, message);
         producer.send(record, (metadata, exception) -> {
             if (exception != null) {
                 LOGGER.error("Failed to send message to topic {}", TOPIC, exception);
@@ -43,7 +43,7 @@ public class MyTopicProducer {
         });
     }
 
-    public void send(String message) {
+    public void send(final String message) {
         send(null, message);
     }
 

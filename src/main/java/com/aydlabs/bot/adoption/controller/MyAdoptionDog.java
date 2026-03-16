@@ -38,7 +38,7 @@ class MyAdoptionDog {
                          final MyTopicProducer producer) {
         this.producer = producer;
 
-        var count = db
+        final var count = db
                 .sql("select count(*) from vector_store")
                 .query(Integer.class)
                 .single();
@@ -46,7 +46,7 @@ class MyAdoptionDog {
             System.out.println("No vector store available");
             repository.findAll()
                       .forEach(dog -> {
-                          var dogument = new Document("id: %s, name: %s, description: %s".formatted(dog.id(), dog.name(), dog.description()));
+                          final var dogument = new Document("id: %s, name: %s, description: %s".formatted(dog.id(), dog.name(), dog.description()));
                           vectorStore.add(List.of(dogument));
                       });
         }
