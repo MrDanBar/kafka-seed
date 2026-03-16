@@ -5,10 +5,10 @@ info:
 
 http:
   method: GET
-  url: "{{url}}/{{user}}/assistant?question=tiene alguna perro en adopción, de mucho pelo?"
+  url: "{{url}}/{{user}}/notify?question=tiene algún perro en adopción, de mucho pelo? no importa si tiene pulgas, acá lo bañamos"
   params:
     - name: question
-      value: tiene alguna perro en adopción, de mucho pelo?
+      value: tiene algún perro en adopción, de mucho pelo? no importa si tiene pulgas, acá lo bañamos
       type: query
   auth: inherit
 
