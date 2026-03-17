@@ -1,5 +1,6 @@
 package com.aydlabs.bot.producers;
 
+import com.oracle.svm.core.annotate.Inject;
 import jakarta.annotation.PreDestroy;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerConfig;
@@ -7,10 +8,13 @@ import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.Properties;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 @Component
 public class MyTopicProducer {
@@ -20,6 +24,7 @@ public class MyTopicProducer {
 
     private final KafkaProducer<String, String> producer;
 
+    @Autowired
     public MyTopicProducer(@Value("${kafka.bootstrap-servers:localhost:9092}") final String bootstrapServers) {
         final Properties props = new Properties();
         props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
