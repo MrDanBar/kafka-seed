@@ -1,0 +1,24 @@
+info:
+  name: Mass-notify
+  type: http
+  seq: 6
+
+http:
+  method: POST
+  url: "{{url}}/{{user}}/create-traffic?question=*"
+  params:
+    - name: question
+      value: "*"
+      type: query
+  auth: inherit
+
+runtime:
+  variables:
+    - name: user
+      value: "1"
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

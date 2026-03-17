@@ -70,7 +70,7 @@ class MyAdoptionDogTest {
 
         final MyAdoptionDog controller = new MyAdoptionDog(
                 promptChatMemoryAdvisor, chatClientBuilder, jdbcClient,
-                dogRepository, vectorStore, dogAdoptionScheduler, producer);
+                dogRepository, vectorStore, dogAdoptionScheduler, producer, null);
 
         mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
     }

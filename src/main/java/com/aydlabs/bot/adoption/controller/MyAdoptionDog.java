@@ -2,6 +2,8 @@ package com.aydlabs.bot.adoption.controller;
 
 import com.aydlabs.bot.adoption.DogAdoptionScheduler;
 import com.aydlabs.bot.adoption.database.DogRepository;
+import com.aydlabs.bot.consumer.KafkaConsumerExecutor;
+import com.aydlabs.bot.producers.KafkaProducerExecutor;
 import com.aydlabs.bot.producers.MyTopicProducer;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.PromptChatMemoryAdvisor;
@@ -11,10 +13,7 @@ import org.springframework.ai.document.Document;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -28,6 +27,8 @@ class MyAdoptionDog {
 
     private final ChatClient ai;
     private final MyTopicProducer producer;
+    private final KafkaProducerExecutor executorService;
+    private final KafkaConsumerExecutor kafkaConsumerExecutor;
 
     public MyAdoptionDog(final PromptChatMemoryAdvisor promptChatMemoryAdvisor,
                          final ChatClient.Builder ai,
@@ -35,8 +36,12 @@ class MyAdoptionDog {
                          final DogRepository repository,
                          final VectorStore vectorStore,
                          final DogAdoptionScheduler dogAdoptionScheduler,
-                         final MyTopicProducer producer) {
+                         final MyTopicProducer producer,
+                         final KafkaProducerExecutor executorService,
+                         final KafkaConsumerExecutor kafkaConsumerExecutor) {
         this.producer = producer;
+        this.executorService = executorService;
+        this.kafkaConsumerExecutor = kafkaConsumerExecutor;
 
         final var count = db
                 .sql("select count(*) from vector_store")
@@ -72,6 +77,22 @@ class MyAdoptionDog {
     @GetMapping("/{user}/notify")
     public String sendMessage(@PathVariable final String user, @RequestParam final String question) {
         producer.send(user, question);
+        return "OK";
+    }
+
+    @PostMapping("/{user}/create-traffic")
+    public String createTraffic(@PathVariable final String user, @RequestParam final String question) {
+        if ("*".equals(question)) {
+            for (int i=0; i<10; i++) {
+                executorService.enviar(user, question + ">>" +i);
+            }
+        }
+
+        if ("**".equals(question)) {
+            kafkaConsumerExecutor.read();
+        }
+
+        executorService.enviar(user, question);
         return "OK";
     }
 }
