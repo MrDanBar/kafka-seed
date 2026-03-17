@@ -2,6 +2,7 @@ package com.aydlabs.bot.adoption.controller;
 
 import com.aydlabs.bot.adoption.DogAdoptionScheduler;
 import com.aydlabs.bot.adoption.database.DogRepository;
+import com.aydlabs.bot.producers.MyTopicProducer;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.PromptChatMemoryAdvisor;
 import org.springframework.ai.chat.client.advisor.vectorstore.QuestionAnswerAdvisor;
@@ -26,14 +27,18 @@ class MyAdoptionDog {
             """;
 
     private final ChatClient ai;
+    private final MyTopicProducer producer;
 
     public MyAdoptionDog(final PromptChatMemoryAdvisor promptChatMemoryAdvisor,
                          final ChatClient.Builder ai,
                          final JdbcClient db,
                          final DogRepository repository,
                          final VectorStore vectorStore,
-                         final DogAdoptionScheduler dogAdoptionScheduler) {
-        var count = db
+                         final DogAdoptionScheduler dogAdoptionScheduler,
+                         final MyTopicProducer producer) {
+        this.producer = producer;
+
+        final var count = db
                 .sql("select count(*) from vector_store")
                 .query(Integer.class)
                 .single();
@@ -41,7 +46,7 @@ class MyAdoptionDog {
             System.out.println("No vector store available");
             repository.findAll()
                       .forEach(dog -> {
-                          var dogument = new Document("id: %s, name: %s, description: %s".formatted(dog.id(), dog.name(), dog.description()));
+                          final var dogument = new Document("id: %s, name: %s, description: %s".formatted(dog.id(), dog.name(), dog.description()));
                           vectorStore.add(List.of(dogument));
                       });
         }
@@ -62,5 +67,11 @@ class MyAdoptionDog {
                 .advisors(advisorSpec -> advisorSpec.param(ChatMemory.CONVERSATION_ID, user))
                 .call()
                 .content();
+    }
+
+    @GetMapping("/{user}/notify")
+    public String sendMessage(@PathVariable final String user, @RequestParam final String question) {
+        producer.send(user, question);
+        return "OK";
     }
 }
