@@ -33,31 +33,33 @@ class DogTest {
     }
 
     @Test
-    void test() {
+    void billCounting_greedyAlgorithm() {
         final var bills = List.of(100, 50, 20, 10, 5, 1);
-
         final var input = List.of(300, 87, 99);
-        final var output = new ArrayList<>();
+        final var output = new ArrayList<Integer>();
 
-        for (var value : input) {
-            int nominalValue = value;
-            int numberOfBills = 0;
-
-            while (nominalValue > 0) {
-                for (var bill : bills) {
-                    if (nominalValue >= bill && nominalValue - bill >= 0) {
-                        nominalValue -= bill;
-                        numberOfBills++;
-                        break;
-                    }
-                }
-
-                LOGGER.info("{} -> [{}] nominal -> {}", value, numberOfBills, nominalValue);
-            }
-
-            output.add(numberOfBills);
+        for (final var value : input) {
+            output.add(countBills(bills, value));
         }
 
-        LOGGER.info("output: {}", output);
+        assertThat(output).isEqualTo(List.of(3, 6, 8));
+    }
+
+    private int countBills(final List<Integer> bills, final int value) {
+        int remaining = value;
+        int count = 0;
+
+        while (remaining > 0) {
+            for (final var bill : bills) {
+                if (remaining >= bill) {
+                    remaining -= bill;
+                    count++;
+                    LOGGER.info("{} -> [{}] remaining -> {}", value, count, remaining);
+                    break;
+                }
+            }
+        }
+
+        return count;
     }
 }
